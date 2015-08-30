@@ -1,0 +1,318 @@
+\documentclass[a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage{mathtools}
+\usepackage{verbatim}
+\usepackage[colorinlistoftodos]{todonotes}
+\usepackage{datetime}
+\usepackage{float}
+
+\begin{document}
+\input{title_page_1.tex}
+
+
+
+\section{Introducción}
+
+El desarrollo de métodos numéricos ha permitido, a lo largo del tiempo, encontrar soluciones a problemas matemáticos, que de otra manera serían muy difíciles o hasta imposibles de resolver. No obstante, las soluciones de los métodos numéricos son aproximaciones de los valores reales, por lo que un cierto grado de error se encontrará presente en las mismas. Es aquí cuando nos preguntamos: ¿Qué error puede considerarse tolerable?
+    
+Para analizar esta cuestión, se deben analizar individualmente los tipos de errores presentes en el método numérico utilizado. Existen diversos tipos de errores: inherentes, de redondeo y de truncamiento, entre otros. En el presente trabajo práctico, se pondrá el enfoque en el último tipo de error mencionado.
+    
+    Es, entonces, el objeto de este documento el estudio en profundidad de los errores de truncamiento utilizando diferentes métodos numéricos para el cálculo de la función error.
+
+\section{Conceptos teóricos}
+
+\subsection{La función error}
+
+La  función error, denotada como erf(x)  es una función trascendental que aparece en probabilidad, estadística, y en la solución de ecuaciones diferenciales parciales. También se la conoce como función error de Gauss. Es una función no elemental utilizada en el campo de la probabilidad de la probabilidad y la estadística, así como para la resolución de ecuaciones diferenciales parciales. La función queda definida por:
+
+\begin{equation}
+erf(x) = \frac{2}{\sqrt{\pi}} \int_{0}^{x}{e^{-t^{2}}} 
+\end{equation}
+
+Dicha función da como resultado la probabilidad de que una serie de pruebas de distribución normal tengan un valor de x unidades de la media, considerando un desvío estándar de $\frac{\sqrt{2}}{2}$
+
+Debido a que la integral no puede calcularse con funciones elementales, deben utilizarse métodos numéricos aproximados.
+
+\section{Desarrollo}
+Como se explico en la sección anterior, la integral de la función error no puede calcularse con funciones elementales de forma cerrada. Sin embargo, expandiendo el integrando $e^{-t^2}$ en su serie de Taylor e integrando termino a termino uno obtiene la serie de Taylor para la función error:
+
+\begin{equation}
+erf(x)=\frac{2}{\sqrt{\pi}}\sum_{k=0}^\infty
+\frac{(-1)^k x^{2k+1}}{k! (2k+1)}
+\end{equation}
+
+Esta no es la única expresión numérica para la función error. También existe:
+
+\begin{equation}
+erf(x)=\frac{2}{\sqrt{\pi}}e^{-x^{2}}\sum_{k=0}^\infty
+\frac{2^k x^{2k+1}}{1.3.5 ... (2k+1)}
+\end{equation}
+
+Con estas expresiones calcularemos, de manera numérica, distintos valores de la función error (principalmente erf(1)). Dado que ambas contienen sumatorias infinitas se las codificara y resolverá con Octave, asignándole un error absoluto tolerable como condición de corte (para evitar crear un ciclo infinito).
+
+Resolver el problema mediante estos métodos, conlleva a cometer errores de truncamiento que afectaran al resultado final. Con el fin de disminuir los mismos se utilizara doble precisión en todos los cálculos.
+
+\section{Resultados}
+
+\subsection{Punto A}
+
+\begin{equation}
+erf(x)=\frac{2}{\sqrt{\pi}}\int_0^x e^{-t^2}\,dt
+\end{equation}
+
+No es posible evaluar la integral dentro de la función de error en forma cerrada utilizando funciones elementales, pero si se expande e integrando mediante una serie de Taylor se obtiene:
+
+\begin{align*}
+\int_0^x e^{-t^2}\,dt
+&=
+\int_0^x
+\left\{
+\sum_{k=0}^\infty \frac{1}{k!}\left(-t^2\right)^{k}
+\right\}\,dt \\
+&=
+\int_0^x
+\left\{
+\sum_{k=0}^\infty
+\frac{1}{k!}(-1)^kt^{2k}
+\right\}\,dt
+\\
+&=
+\sum_{k=0}^\infty(-1)^k\frac{1}{k!}
+\left\{
+\int_0^x t^{2k}\,dt
+\right\} \\
+&=
+\bigg(\sum_{k=0}^\infty
+(-1)^k\frac{1}{k!}\frac{1}{2k+1}t^{2k+1}\bigg)\bigg|_0^x
+\end{align*}
+
+Se obtiene la siguiente serie de Taylor para la función error:
+
+\begin{equation}
+erf(x)=\frac{2}{\sqrt{\pi}}\sum_{k=0}^\infty
+\frac{(-1)^k x^{2k+1}}{k! (2k+1)} = \frac{2}{\sqrt{\pi}}
+\bigg(x-\frac{x^{3}}{3}+\frac{x^{5}}{10}-\frac{x^{7}}{42}+...\bigg)
+\end{equation}
+
+Expresión que es válida par todo número real x y también en todo el plano complejo.
+
+\subsection{Punto B}
+Otra posible expresión para la función de error es:
+
+\begin{equation}
+erf(x)=\frac{2}{\sqrt{\pi}}e^{-x^{2}}\sum_{k=0}^\infty
+\frac{2^k x^{2k+1}}{1.3.5 ... (2k+1)}
+\end{equation}\\
+
+Las expresiones (5) y (6) se cumplen para k=0,1,2,3,4.\\ \\
+Para facilitar la verificación, reemplazamos la exponencial por su desarrollo en serie de Taylor:
+
+\begin{equation}
+\sum_{k=0}^\infty
+\frac{(-1)^k x^{2k}}{k!}
+\end{equation}
+
+Obteniendo:
+
+\begin{equation}
+erf(x)=\frac{2}{\sqrt{\pi}}\sum_{k=0}^\infty
+\frac{(-1)^k x^{2k}}{k!}\sum_{k=0}^\infty
+\frac{2^k x^{2k+1}}{1.3.5 ... (2k+1)}
+\end{equation}\\ \\
+
+
+El desarrollo de la expresión (5) es:\\
+
+Para k = 0:
+\begin{align*}
+erf(x)= \frac{2}{\sqrt{\pi}}x
+\end{align*}
+
+Para k = 1:
+\begin{align*}
+erf(x)= \frac{2}{\sqrt{\pi}}
+\bigg(x-\frac{x^{3}}{3}\bigg)
+\end{align*}
+
+Para k = 2:
+\begin{align*}
+erf(x)= \frac{2}{\sqrt{\pi}}
+\bigg(x-\frac{x^{3}}{3}+\frac{x^{5}}{10}\bigg)
+\end{align*}
+
+Para k = 3:
+\begin{align*}
+erf(x)= \frac{2}{\sqrt{\pi}}
+\bigg(x-\frac{x^{3}}{3}+\frac{x^{5}}{10}-\frac{x^{7}}{42}\bigg)
+\end{align*}
+
+Para k = 4:
+\begin{align*}
+erf(x)= \frac{2}{\sqrt{\pi}}
+\bigg(x-\frac{x^{3}}{3}+\frac{x^{5}}{10}-\frac{x^{7}}{42}+\frac{x^{9}}{216}\bigg)
+\end{align*}\\ \\
+
+\begin{comment}
+Para k = 5:
+\begin{align*}
+erf(x)= \frac{2}{\sqrt{\pi}}
+\bigg(x-\frac{x^{3}}{3}+\frac{x^{5}}{10}-\frac{x^{7}}{42}+\frac{x^{9}}{216}-\frac{x^{11}}{1320}\bigg)
+\end{align*}
+
+Para k = 6:
+\begin{align*}
+erf(x)= \frac{2}{\sqrt{\pi}}
+\bigg(x-\frac{x^{3}}{3}+\frac{x^{5}}{10}-\frac{x^{7}}{42}+\frac{x^{9}}{216}-\frac{x^{11}}{1320}+\frac{x^{13}}{9360}\bigg)
+\end{align*}
+\end{comment}
+
+El desarrollo de la expresión (8) es:\\
+
+Para k = 0:
+\begin{align*}
+erf(x)
+&=
+\frac{2}{\sqrt{\pi}}\big(1\big)\big(x\big)\\
+&=
+\frac{2}{\sqrt{\pi}}x
+\end{align*}
+
+Para k = 1:
+\begin{align*}
+erf(x)
+&=
+\frac{2}{\sqrt{\pi}}\bigg(1-x^{2}\bigg)\bigg(x+\frac{2x^{3}}{3}\bigg)\\
+&=
+\frac{2}{\sqrt{\pi}}\bigg(x-\frac{x^{3}}{3}-\frac{2x^{5}}{3}\bigg)
+\end{align*}
+
+Para k = 2:
+\begin{align*}
+erf(x)
+&=\frac{2}{\sqrt{\pi}}\bigg(1-x^{2}+\frac{x^4}{2}\bigg)\bigg(x+\frac{2x^{3}}{3}+\frac{4x^5}{15}\bigg)\\
+&=
+\frac{2}{\sqrt{\pi}}\bigg(x-\frac{x^{3}}{3}+\frac{x^{5}}{10}+\frac{x^{7}}{15}+\frac{2x^{9}}{15}\bigg)
+\end{align*}
+
+Para k = 3:
+\begin{align*}
+erf(x)
+&=\frac{2}{\sqrt{\pi}}\bigg(1-x^{2}+\frac{x^4}{2}-\frac{x^6}{6}\bigg)\bigg(x+\frac{2x^{3}}{3}+\frac{4x^5}{15}+\frac{8x^7}{105}\bigg)\\
+&=\frac{2}{\sqrt{\pi}}\bigg(x-\frac{x^3}{3}+\frac{x^5}{10}-\frac{x^7}{42}-\frac{17x^9}{315}-\frac{2x^{11}}{315}-\frac{4x^{13}}{315}\bigg)
+\end{align*}
+
+Para k = 4:
+\begin{align*}
+erf(x)
+&=\frac{2}{\sqrt{\pi}}\bigg(1-x^{2}+\frac{x^4}{2}-\frac{x^6}{6}+\frac{x^8}{24}\bigg)\bigg(x+\frac{2x^{3}}{3}+\frac{4x^5}{15}+\frac{8x^7}{105}+\frac{16x^9}{945}\bigg)\\
+&=\frac{2}{\sqrt{\pi}}\bigg(x-\frac{x^3}{3}+\frac{x^5}{10}-\frac{x^7}{42}+\frac{x^9}{216}+\frac{17x^{11}}{3780}+\frac{13x^{13}}{1890}+\frac{x^{15}}{2835}+\frac{2x^{17}}{2835}\bigg)
+\end{align*}\\
+
+\begin{comment}
+Para k = 5:
+\begin{align*}
+erf(x)
+&=\frac{2}{\sqrt{\pi}}\bigg(1-x^{2}+\frac{x^4}{2}-\frac{x^6}{6}+\frac{x^8}{24}-\frac{x^{10}}{120}\bigg)\bigg(x+\frac{2x^{3}}{3}+\frac{4x^5}{15}+\frac{8x^7}{105}+\frac{16x^9}{945}+\frac{32x^{11}}{10395}\bigg)\\
+&=\frac{2}{\sqrt{\pi}}\bigg(x-\frac{x^3}{3}+\frac{x^5}{10}-\frac{x^7}{42}+\frac{x^9}{216}-\frac{x^{11}}{1320}-\frac{73x^{13}}{41580}-\frac{103x^{15}}{311850}-\frac{23x^{17}}{51975}-\frac{2x^{19}}{155925}-\frac{4x^{21}}{155925}\bigg)
+\end{align*}
+
+Para k = 6:
+\begin{align*}
+erf(x)
+&=\frac{2}{\sqrt{\pi}}\bigg(1-x^{2}+\frac{x^4}{2}-\frac{x^6}{6}+\frac{x^8}{24}-\frac{x^{10}}{120}+\frac{x^{12}}{720}\bigg)\bigg(x+\frac{2x^{3}}{3}+\frac{4x^5}{15}+\frac{8x^7}{105}+\frac{16x^9}{945}+\frac{32x^{11}}{10395}+\frac{64x^{13}}{135135}\bigg)\\
+&=\frac{2}{\sqrt{\pi}}\bigg(x-\frac{x^3}{3}+\frac{x^5}{10}-\frac{x^7}{42}+\frac{x^9}{216}-\frac{x^{11}}{1320}+\frac{x^{13}}{9360}+\frac{1979x^{15}}{16216200}+\frac{89x^{17}}{540540}+\frac{19x^{19}}{1351350}+\frac{107x^{21}}{6081075}+\frac{2x^{23}}{6081075}+\frac{4x^{25}}{6081075}bigg)
+\end{align*}
+\end{comment}
+
+Queda verificado entonces que ambas expresiones son equivalentes hasta su k-ésimo término.
+
+\subsection{Puntos C y D}
+A continuación se presentan los resultados numéricos obtenidos en los puntos C y D.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{l c  r}
+\hline
+n & Serie Punto A & Serie Punto B \\ \hline
+4 & 0.842699 & 0.842697\\
+6 & 0.842701 & 0.842701\\
+8 & 0.842701 & 0.842701\\ \hline
+\end{tabular}
+\caption{Resultados de erf(1) utilizando las series provistas}
+\end{table}
+
+\subsection{Punto E}
+\begin{table}[H]
+\centering
+\begin{tabular}{l c  c  r}
+\hline
+n & Raices $r_{n,i}$ & Coeficientes $c_{n,i}$ & Resultado \\ \hline
+2 & 0.5773502692 & 1.0000000000 &   \\
+  & -0.5773502692 & 1.0000000000 & 0.808519\\
+  \hline
+3 & 0.7745966692 & 0.5555555556 &   \\
+  & 0.0000000000 & 0.8888888889 &  0.845539 \\
+  & -0.7745966692 & 0.5555555556 & \\
+  \hline
+4 & 0.8611363116 & 0.3478548451 &   \\
+  & 0.3399810436 & 0.6521451549 & \\
+  & -0.3399810436 & 0.6521451549 &  0.842524\\
+  & -0.8611363116 & 0.3478548451 & \\
+  \hline
+5 & 0.9061798459 & 0.2369268850 &   \\
+  & 0.5384693101 & 0.4786286705 &   \\
+  & 0.0000000000 & 0.5688888889 & 0.842710 \\
+  & -0.5384693101 & 0.4786286705 &  \\
+  & -0.9061798459 & 0.2369268850 &  \\ \hline
+\end{tabular}
+\end{table}
+
+\subsection{Punto F}
+El resultado de invocar erf(1) es 0,84270.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{l c  r}
+\hline
+Serie & Error absoluto & Límite del error relativo \\ \hline
+A(n=4) & $10^{-4}$ & $10^{-4}$ \\
+A(n=6) & $10^{-6}$ & $10^{-6}$\\
+A(n=8) & $10^{-6}$ & $10^{-8}$\\ \hline
+B(n=4) & $3.10^{-6}$ & $10^{-4}$\\
+B(n=6) & $10^{-6}$ & $10^{-6}$\\
+B(n=8) & $10^{-6}$ & $10^{-8}$\\ \hline
+E(n=2) & $4.10^{-2}$ & -\\
+E(n=3) & $3.10^{-3}$ & -\\
+E(n=4) & $10^{-4}$ & -\\
+E(n=5) & $10^{-5}$ & -\\ \hline
+\end{tabular}
+\caption{Comparación de los errores de los resultados provistos por las series A,B y E implementadas en Octave para erf(1)}
+\end{table}
+
+En cuanto al Método de Mac Laurin para aproximar la función error (series A y B), puede observarse que sus estimaciones para n=4 y n=6 cumplen las premisas del error absoluto, mientras que para n=8 las mismas tienen un error mayor.
+Los resultados provistos por el método de Gauss-Lagrange tienen un error absoluto de hasta cuatro órdenes de magnitud mayor que los de la serie de Taylor (tomando dos puntos en la cuadratura de Gauss-Legendre). A medida que se toman más puntos, los resultados de la cuadratura resultan más exactos, es decir, se aproximan al calculado por medio de Octave.
+
+
+\subsection{Punto G}
+En el caso de calcular la función erf(4) utilizando las series ya presentadas, se obtiene el mismo comportamiento. Los cálculos involucrados no varían, y si se observan los resultados, se puede apreciar que la serie continua obteniendo resultados con un error despreciable. De hecho, con la serie del Punto B se obtiene el mismo resultado que el entregado por Octave al invocar la función de error.
+
+\begin{table}[!ht]
+\centering
+\begin{tabular}{l c  r}
+\hline
+n & Serie Punto A & Serie Punto B \\ \hline
+4 & 0.999982 & 1.000000\\
+6 & 1.000000 & 1.000000\\
+8 & 1.000000 & 1.000000\\ \hline
+\end{tabular}
+\caption{Resultados de erf(4) utilizando las series provistas}
+\end{table}
+
+\section{Conclusiones}
+
+Resulta esperable que la utilización del método de cuadratura de Gauss-Legendre provoque errores de gran magnitud. Esto se debe a que la función a integrar es una exponencial mientras que el método en cuestión considera un polinomio para el cálculo. A medida que se tomen más puntos para el cálculo los resultados se encontrarán más cercanos al verdadero. No obstante, por lo mencionado con respecto al fundamento del método, éste no resulta demasiado útil para evaluar la función error.
+Por el contrario, la utilización de la serie de Mac Laurin para el cálculo de la función error resulta conveniente debido a la gran exactitud a pesar de tomar valores bajos de n.
+
+
+\end{document}
