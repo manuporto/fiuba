@@ -37,8 +37,19 @@ while (my $line = <$fh>) {
     if ($fields[0] ne $zone_code) {
         continue;
     }
-    $cultivado{$fields[2]} += ($fields[6] - $fields[4]); 
+    if (exists $cultivado{$fields[2]}) {
+        $cultivado{$fields[2]} += ($fields[6] - $fields[4]); 
+    } else {
+        $cultivado{$fields[2]} = ($fields[6] - $fields[4]); 
+    }
 }
 close($fh);
 
-
+my $username = getpwuid($<);
+open($fh, ">", $output_file);
+keys %cultivado;
+while (my($k, $v) = each %cultivado) {
+    my $time = localtime;
+    print $fh "$zone_code,$zone_name,$k,$v,$username,$time\n";
+}
+close($fh);
